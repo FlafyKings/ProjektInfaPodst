@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <title>Upload plików</title>
+    <style>
+        #div {
+            width: 100%;
+            height: 300px;
+            color: white;
+            background: lightblue;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="div">
+        <p style="margin: 0 auto; text-align: center; font-size: 30px;" id="p">Upuść plik</p>
+    </div>
+    <div id="napis">
+    </div>
+</body>
+<script>
+    $("html").on("dragover", function (e) {
+        console.log("dragover nad dokumentem html")
+        document.getElementById("p").innerHTML = 'Przenieś plik nad niebieskie pole'
+        e.preventDefault(); // usuwa domyślne zachowanie strony po wykonaniu zdarzenia
+        e.stopPropagation(); // zatrzymuje dalszą propagację zdarzenia
+    });
+    $('#div').on('dragover', function (e) {
+        console.log("drag over na divie")
+        document.getElementById("p").innerHTML = 'Upuść plik'
+        e.stopPropagation();
+        e.preventDefault();
+    });
+
+    $("html").on("drop", function (e) {
+        console.log("drop na dokumencie html")
+
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    $('#div').on('dragenter', function (e) {
+        console.log("drag enter na divie")
+        e.stopPropagation();
+        e.preventDefault();
+    });
+    $('#div').on('dragleave', function (e) {
+        console.log("dragleave na divie")
+        e.stopPropagation();
+        e.preventDefault();
+
+    });
+    $('#div').on('drop', function (e) {
+        var fd = new FormData();
+        console.log("drop na divie")
+        e.stopPropagation();
+        e.preventDefault();
+
+        var files = e.originalEvent.dataTransfer.files;
+        console.table(files)
+        for (var i =0;i<files.length;i++){
+            let a = document.createElement('p')
+            a.innerHTML = files.name[i]
+            document.getElementById('napis').appendChild(a)
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            fd.append('file', files[i])
+        }
+        $.ajax({
+            url: '/uploadd',
+            type: 'POST',
+            data: fd,
+            contentType: false, // ajax nie określa typu przesyłanych danych
+            processData: false, // ajax w żaden sposób nie przetwarza danych
+            success: function (response) {
+                var uploadObject = JSON.parse(response)
+
+                console.table(uploadObject);
+
+            },
+
+        })
+
+
+
+
+
+
+    });
+
+
+</script>
+
+</html>
